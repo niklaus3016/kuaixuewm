@@ -766,16 +766,16 @@ export default function App() {
             <button 
               onClick={handleSave}
               disabled={!displayContent}
-              className="w-full py-4 bg-gradient-to-br from-primary to-[#00A2FF] text-white rounded-[1.75rem] font-black shadow-lg shadow-primary/20 hover:brightness-110 transition-all disabled:grayscale disabled:opacity-50 active:scale-[0.96] text-sm tracking-tight"
+              className="w-full py-4 bg-gradient-to-br from-primary to-[#00a2ff] text-white rounded-[28px] font-black shadow-lg shadow-primary/20 hover:brightness-110 transition-all disabled:grayscale disabled:opacity-50 active:scale-[0.96] text-sm tracking-tight"
             >
               保存并导出高清图 ({exportSize}px)
             </button>
 
             <div className="grid grid-cols-2 gap-3">
-               <button onClick={() => setIsBeautifyOpen(true)} className="py-3 bg-white border border-white rounded-[1.25rem] text-[11px] font-black text-slate-800 uppercase tracking-wider hover:bg-slate-50 transition-all flex items-center justify-center gap-2 shadow-sm">
+               <button onClick={() => setIsBeautifyOpen(true)} className="py-3 bg-white border border-white rounded-[20px] text-[11px] font-black text-slate-800 uppercase tracking-wider hover:bg-slate-50 transition-all flex items-center justify-center gap-2 shadow-sm">
                  <Palette size={14} className="text-primary" /> 二维码美化
               </button>
-              <button onClick={() => { setQrStyle(DEFAULT_STYLE); setActiveTemplate(null); }} className="py-3 bg-white border border-white rounded-[1.25rem] text-[11px] font-black text-slate-800 uppercase tracking-wider hover:bg-slate-50 transition-all flex items-center justify-center gap-2 shadow-sm">
+              <button onClick={() => { setQrStyle(DEFAULT_STYLE); setActiveTemplate(null); }} className="py-3 bg-white border border-white rounded-[20px] text-[11px] font-black text-slate-800 uppercase tracking-wider hover:bg-slate-50 transition-all flex items-center justify-center gap-2 shadow-sm">
                  <Settings size={14} className="text-slate-400" /> 重置样式
               </button>
             </div>
@@ -919,7 +919,7 @@ export default function App() {
               </div>
 
               <div className="w-full max-w-xs mt-12 space-y-3">
-                <div className="bg-white rounded-[2rem] p-1.5 shadow-sm border border-white">
+                <div className="bg-white rounded-3xl p-1.5 shadow-sm border border-white">
                    {[
                      { 
                        icon: ShieldCheck, 
@@ -944,7 +944,7 @@ export default function App() {
                    ))}
                 </div>
 
-                <div className="bg-gradient-to-br from-slate-800 to-black rounded-[2rem] p-6 shadow-xl relative overflow-hidden group">
+                <div className="bg-gradient-to-br from-slate-800 to-black rounded-3xl p-6 shadow-xl relative overflow-hidden group">
                    <div className="absolute -right-10 -top-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
                    <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] mb-3 relative z-10 text-center">关于产品</h3>
                    <p className="text-xs text-slate-300 font-medium leading-relaxed relative z-10 text-center tracking-tight">
@@ -960,7 +960,7 @@ export default function App() {
       </div>
 
       {/* --- Bottom Navigation Bar --- */}
-      <nav className="h-20 bg-white/80 backdrop-blur-2xl border-t border-black/5 flex items-center justify-around px-8 shrink-0 z-[60] pb-4">
+      <nav className="h-20 bg-white/80 backdrop-blur-2xl border-t border-black/5 flex items-center justify-around px-8 shrink-0 z-60 pb-4">
         {[
           { id: 'home' as Screen, label: '制作', icon: Home },
           { id: 'history' as Screen, label: '历史', icon: History },
@@ -992,11 +992,11 @@ export default function App() {
 
       {/* Confirmation Modal */}
       {showConfirmModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-[2.5rem] p-8 w-full max-w-xs shadow-2xl space-y-6"
+            className="bg-white rounded-[40px] p-8 w-full max-w-xs shadow-2xl space-y-6"
           >
             <div className="text-center space-y-2">
               <h3 className="text-xl font-black text-slate-900">确认清除？</h3>
@@ -1007,7 +1007,7 @@ export default function App() {
             <div className="flex flex-col gap-2">
               <button 
                 onClick={confirmDelete}
-                className="w-full py-4 bg-red-500 text-white rounded-[1.5rem] font-black text-sm uppercase tracking-widest shadow-lg shadow-red-200"
+                className="w-full py-4 bg-red-500 text-white rounded-[24px] font-black text-sm uppercase tracking-widest shadow-lg shadow-red-200"
               >
                 确认删除
               </button>
@@ -1024,7 +1024,7 @@ export default function App() {
 
       {/* Privacy Modal */}
       {showPrivacyModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -1053,7 +1053,7 @@ export default function App() {
 
       {/* About Modal */}
       {showAboutModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
