@@ -103,9 +103,12 @@ jobs:
     - name: Build Android Release APK
       run: |
         cd android
+        KEYSTORE_PATH=$(pwd)/my-release-key.keystore
         echo "=== Building Release APK ==="
+        echo "Keystore path: $KEYSTORE_PATH"
+        ls -la my-release-key.keystore
         ./gradlew clean
-        ./gradlew assembleRelease --no-build-cache --no-daemon -Pandroid.injected.signing.store.file=my-release-key.keystore -Pandroid.injected.signing.store.password="${{ secrets.KEYSTORE_PASSWORD }}" -Pandroid.injected.signing.key.alias=kuaixuewm -Pandroid.injected.signing.key.password="${{ secrets.KEYSTORE_PASSWORD }}"
+        ./gradlew assembleRelease --no-build-cache --no-daemon -Pandroid.injected.signing.store.file="$KEYSTORE_PATH" -Pandroid.injected.signing.store.password="${{ secrets.KEYSTORE_PASSWORD }}" -Pandroid.injected.signing.key.alias=kuaixuewm -Pandroid.injected.signing.key.password="${{ secrets.KEYSTORE_PASSWORD }}"
         ls -la app/build/outputs/apk/release/
 
     - name: Build Android Debug APK
