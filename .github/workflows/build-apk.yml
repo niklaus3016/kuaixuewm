@@ -39,12 +39,50 @@ jobs:
     - name: Sync Capacitor
       run: npx cap sync android
 
-    - name: Build APK
+    - name: Build Debug APK
       working-directory: android
       run: ./gradlew assembleDebug
 
-    - name: Upload APK
+    - name: Upload Debug APK
       uses: actions/upload-artifact@v4
       with:
         name: app-debug.apk
         path: android/app/build/outputs/apk/debug/app-debug.apk
+
+    - name: Check for signing secrets
+      id: check_signing
+      run: |
+        if [ -n "${{ secrets.KEYSTORE_FILE }}" ] && [ -n "${{ secrets.KEYSTORE_PASSWORD }}" ]; then
+          echo "signing_available=true" >> $GITHUB_OUTPUT
+        else
+          echo "signing_available=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Build Release APK (Signed)
+      if: steps.check_signing.outputs.signing_available == 'true'
+      working-directory: android
+      env:
+        KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      run: ./gradlew assembleRelease
+
+    - name: Upload Signed Release APK
+      if: steps.check_signing.outputs.signing_available == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release-signed.apk
+        path: android/app/build/outputs/apk/release/app-release.apk
+
+    - name: Build Release APK (Unsigned)
+      if: steps.check_signing.outputs.signing_available == 'false'
+      working-directory: android
+      run: ./gradlew assembleRelease -Pandroid.injected.signing.store.file=
+
+    - name: Upload Unsigned Release APK
+      if: steps.check_signing.outputs.signing_available == 'false'
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release-unsigned.apk
+        path: android/app/build/outputs/apk/release/app-release-unsigned.apk
