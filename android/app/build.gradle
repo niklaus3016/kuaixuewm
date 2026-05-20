@@ -18,7 +18,7 @@ android {
         release {
             def storeFilePath = project.hasProperty('android.injected.signing.store.file') ? project.property('android.injected.signing.store.file') : System.getenv("KEYSTORE_FILE")
             def storePass = project.hasProperty('android.injected.signing.store.password') ? project.property('android.injected.signing.store.password') : System.getenv("KEYSTORE_PASSWORD")
-            def keyAlias = project.hasProperty('android.injected.signing.key.alias') ? project.property('android.injected.signing.key.alias') : System.getenv("KEY_ALIAS")
+            def keyAliasName = project.hasProperty('android.injected.signing.key.alias') ? project.property('android.injected.signing.key.alias') : System.getenv("KEY_ALIAS")
             def keyPass = project.hasProperty('android.injected.signing.key.password') ? project.property('android.injected.signing.key.password') : System.getenv("KEY_PASSWORD")
             
             if (storeFilePath) {
@@ -27,8 +27,8 @@ android {
             if (storePass) {
                 storePassword storePass
             }
-            if (keyAlias) {
-                keyAlias keyAlias
+            if (keyAliasName) {
+                keyAlias keyAliasName
             }
             if (keyPass) {
                 keyPassword keyPass
