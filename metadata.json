@@ -1,0 +1,6 @@
+{
+  "name": "快序二维码",
+  "description": "提供极简、专业且完全本地化的二维码生成与美化体验。支持网址、WiFi、名片及文本内容，支持导出高清图及矢量图。",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
