@@ -25,7 +25,11 @@ jobs:
       run: npm run build
     
     - name: Sync web resources to Android
-      run: npx cap sync android
+      run: |
+        echo "=== Installing Capacitor CLI ==="
+        npm install -D @capacitor/cli
+        echo "=== Syncing web resources to Android ==="
+        npx cap sync android
     
     - name: Set up JDK
       uses: actions/setup-java@v4
