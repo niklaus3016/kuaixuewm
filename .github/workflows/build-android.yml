@@ -26,7 +26,8 @@ jobs:
     
     - name: Sync web resources to Android
       run: |
-        echo "=== Installing Capacitor CLI ==="
+        echo "=== Installing Capacitor dependencies ==="
+        npm install @capacitor/core @capacitor/android
         npm install -D @capacitor/cli
         echo "=== Syncing web resources to Android ==="
         npx cap sync android
