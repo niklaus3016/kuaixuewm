@@ -386,7 +386,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-md mx-auto bg-[#F2F2F7] overflow-hidden shadow-2xl relative md:my-8 md:h-[90vh] md:rounded-[50px] md:border-[12px] md:border-black pt-4">
+    <div className="flex flex-col h-screen max-w-md mx-auto bg-[#f2f2f7] overflow-hidden shadow-2xl relative md:my-8 md:h-[90vh] md:rounded-[50px] md:border-[12] md:border-black pt-4">
 
       {/* --- Floating Toast --- */}
       <AnimatePresence>
@@ -395,7 +395,7 @@ export default function App() {
             initial={{ opacity: 0, y: -50, scale: 0.9 }}
             animate={{ opacity: 1, y: 15, scale: 1 }}
             exit={{ opacity: 0, y: -50, scale: 0.9 }}
-            className="absolute top-10 left-0 right-0 flex justify-center z-[100] pointer-events-none"
+            className="absolute top-10 left-0 right-0 flex justify-center z-100 pointer-events-none"
           >
             <div className="bg-black/80 backdrop-blur-xl text-white px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-2.5 border border-white/10">
               <div className="bg-[#34C759] rounded-full p-1 text-white">
@@ -471,7 +471,7 @@ export default function App() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="bg-white rounded-[2rem] p-4 shadow-sm border border-white"
+                className="bg-white rounded-3xl p-4 shadow-sm border border-white"
               >
                 {activeTab === 'url' && (
                   <div className="relative">
@@ -582,12 +582,12 @@ export default function App() {
         )}>
           <div 
             className={cn(
-              "bg-white rounded-[3rem] shadow-ios border border-white transition-all duration-500 relative z-10",
+              "bg-white rounded-3xl shadow-ios border border-white transition-all duration-500 relative z-10",
               isBeautifyOpen ? "p-2 scale-90" : "p-4 scale-100"
             )}
             ref={qrRef}
           >
-            <div className="relative p-1 bg-white rounded-[2rem] overflow-hidden">
+            <div className="relative p-1 bg-white rounded-3xl overflow-hidden">
               {displayContent ? (
                 <QRCodeCanvas 
                   value={displayContent}
@@ -673,17 +673,17 @@ export default function App() {
               
               <div className="flex gap-3">
                 <label className="flex-1 cursor-pointer group">
-                  <div className="h-20 bg-white border border-white rounded-[1.5rem] shadow-sm flex items-center justify-center transition-all group-active:scale-95 overflow-hidden">
+                  <div className="h-20 bg-white border border-white rounded-[15px] shadow-sm flex items-center justify-center transition-all group-active:scale-95 overflow-hidden">
                     {qrStyle.logoImage ? (
                       <div className={cn(
                         "h-14 w-14 overflow-hidden bg-white flex items-center justify-center border border-slate-100 transition-all duration-300",
-                        qrStyle.logoShape === 'circle' ? "rounded-full shadow-[0_0_0_2px_rgba(52,199,89,0.1)]" : "rounded-[1rem]"
+                        qrStyle.logoShape === 'circle' ? "rounded-full shadow-[0_0_0_2px_rgba(52,199,89,0.1)]" : "rounded-[16px]"
                       )}>
                         <img 
                           src={qrStyle.logoImage} 
                           className={cn(
                             "h-full w-full object-cover transition-all duration-300",
-                            qrStyle.logoShape === 'circle' ? "rounded-full" : "rounded-[1rem]"
+                            qrStyle.logoShape === 'circle' ? "rounded-full" : "rounded-lg"
                           )} 
                           alt="logo" 
                         />
