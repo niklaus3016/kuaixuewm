@@ -16,7 +16,7 @@
 
 @layer base {
   body {
-    @apply font-sans text-text bg-[#F2F2F7] min-h-screen overflow-x-hidden transition-colors duration-300;
+    @apply font-sans text-text bg-surface-soft min-h-screen overflow-x-hidden transition-colors duration-300;
     -webkit-tap-highlight-color: transparent;
   }
 }
@@ -29,6 +29,13 @@
     @apply bg-white rounded-[2.5rem] shadow-ios border border-white/50;
   }
 }
+
+/* 自定义 z-index 值 */
+.z-60 { z-index: 60; }
+.z-100 { z-index: 100; }
+.z-120 { z-index: 120; }
+.z-130 { z-index: 130; }
+.z-140 { z-index: 140; }
 
 .scrollbar-none::-webkit-scrollbar {
   display: none;

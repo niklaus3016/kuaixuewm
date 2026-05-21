@@ -3,22 +3,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { 
-  Link, 
-  Type, 
-  Wifi, 
-  Contact, 
-  Settings, 
-  History, 
-  Plus, 
-  Download, 
-  Share2, 
-  Palette, 
+import {
+  Link,
+  Type,
+  Wifi,
+  Contact,
+  Settings,
+  History,
+  Palette,
   Image as ImageIcon,
-  Trash2,
-  Copy,
   Check,
   ChevronRight,
   X,
@@ -90,33 +85,57 @@ export default function App() {
 
   // --- Effects ---
   useEffect(() => {
-    const saved = localStorage.getItem('qr_history');
-    if (saved) setHistory(JSON.parse(saved));
+    try {
+      const saved = localStorage.getItem('qr_history');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setHistory(parsed);
+        }
+      }
+    } catch {
+      // 如果解析失败，清空历史记录
+      setHistory([]);
+    }
   }, []);
 
   useEffect(() => {
-    const agreed = localStorage.getItem('privacy_agreed');
-    if (!agreed) {
+    try {
+      const agreed = localStorage.getItem('privacy_agreed');
+      if (!agreed) {
+        setShowPrivacyConsent(true);
+      }
+    } catch {
+      // localStorage 不可用时，显示隐私同意弹窗
       setShowPrivacyConsent(true);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('qr_history', JSON.stringify(history));
+    try {
+      localStorage.setItem('qr_history', JSON.stringify(history));
+    } catch {
+      // localStorage 写入失败时静默处理
+    }
   }, [history]);
 
-  // Sync content based on tab
-  useEffect(() => {
+  // Sync content based on tab - 使用 useMemo 优化性能
+  const derivedContent = useMemo(() => {
     if (activeTab === 'wifi') {
-      setContent(generateWiFiString(wifiConfig));
+      return generateWiFiString(wifiConfig);
     } else if (activeTab === 'vCard') {
-      setContent(generateVCardString(vCardConfig));
+      return generateVCardString(vCardConfig);
     } else if (activeTab === 'url') {
-      setContent(urlContent);
+      return urlContent;
     } else if (activeTab === 'text') {
-      setContent(textContent);
+      return textContent;
     }
+    return '';
   }, [activeTab, wifiConfig, vCardConfig, urlContent, textContent]);
+
+  useEffect(() => {
+    setContent(derivedContent);
+  }, [derivedContent]);
 
   useEffect(() => {
     if (rawLogo) {
@@ -196,12 +215,12 @@ export default function App() {
     setQrStyle(prev => ({ ...prev, fgColor: t.fg, bgColor: t.bg }));
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = useCallback(() => {
     if (!content) return;
     setDisplayContent(content);
     // 自动在生成时添加一条记录，但不弹出保存成功提示
     addToHistory(content);
-  };
+  }, [content]);
 
   const handleSave = () => {
     if (!displayContent) return;
@@ -271,7 +290,7 @@ export default function App() {
     setHistory([newItem, ...history.slice(0, 49)]);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = useCallback(() => {
     if (selectedIds.length === 0 && history.length > 0 && !isSelectionMode) {
       setHistory([]);
     } else {
@@ -282,23 +301,23 @@ export default function App() {
     setShowConfirmModal(false);
     setShowCopyFeedback(true);
     setTimeout(() => setShowCopyFeedback(false), 2000);
-  };
+  }, [selectedIds, history.length, isSelectionMode]);
 
-  const toggleItemSelection = (id: string) => {
-    setSelectedIds(prev => 
+  const toggleItemSelection = useCallback((id: string) => {
+    setSelectedIds(prev =>
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
-  };
+  }, []);
 
-  const toggleSelectAll = () => {
+  const toggleSelectAll = useCallback(() => {
     if (selectedIds.length === history.length) {
       setSelectedIds([]);
     } else {
       setSelectedIds(history.map(item => item.id));
     }
-  };
+  }, [selectedIds.length, history]);
 
-  const clearHistory = () => {
+  const clearHistory = useCallback(() => {
     if (isSelectionMode) {
       if (selectedIds.length > 0) {
         setShowConfirmModal(true);
@@ -308,14 +327,18 @@ export default function App() {
     } else {
       setIsSelectionMode(true);
     }
-  };
+  }, [isSelectionMode, selectedIds.length]);
 
-  const handleShare = async () => {
+  const handleShare = useCallback(async () => {
+    if (!navigator.share) {
+      console.warn('Web Share API not supported');
+      return;
+    }
     const canvas = qrRef.current?.querySelector('canvas');
     if (!canvas) return;
-    
+
     canvas.toBlob(async (blob) => {
-      if (blob && navigator.share) {
+      if (blob) {
         const file = new File([blob], "qrcode.png", { type: "image/png" });
         try {
           await navigator.share({
@@ -328,13 +351,15 @@ export default function App() {
         }
       }
     });
-  };
+  }, []);
 
-  const handleCopyContent = () => {
-    navigator.clipboard.writeText(content);
+  const handleCopyContent = useCallback(() => {
+    navigator.clipboard.writeText(content).catch(() => {
+      // 复制失败时静默处理
+    });
     setShowCopyFeedback(true);
     setTimeout(() => setShowCopyFeedback(false), 2000);
-  };
+  }, [content]);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -386,7 +411,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-md mx-auto bg-[#f2f2f7] overflow-hidden shadow-2xl relative md:my-8 md:h-[90vh] md:rounded-[50px] md:border-[12] md:border-black pt-4">
+    <div className="flex flex-col h-screen max-w-md mx-auto bg-[#f2f2f7] overflow-hidden shadow-2xl relative md:my-8 md:h-[90vh] md:rounded-[50px] md:border-[12px] md:border-black pt-4">
 
       {/* --- Floating Toast --- */}
       <AnimatePresence>
@@ -519,10 +544,10 @@ export default function App() {
                         value={wifiConfig.password}
                         onChange={e => setWifiConfig({...wifiConfig, password: e.target.value})}
                       />
-                      <select 
+                      <select
                         className="px-4 py-3 bg-slate-50 rounded-2xl border-none text-sm outline-none appearance-none font-bold text-primary"
                         value={wifiConfig.encryption}
-                        onChange={e => setWifiConfig({...wifiConfig, encryption: e.target.value as any})}
+                        onChange={e => setWifiConfig({...wifiConfig, encryption: e.target.value as WIFIConfig['encryption']})}
                       >
                         <option value="WPA">WPA/WPA2</option>
                         <option value="WEP">WEP</option>
@@ -700,16 +725,16 @@ export default function App() {
 
                 <div className="w-28 flex flex-col gap-2">
                   {[
-                    { id: 'square', label: '圆角矩形', icon: 'rounded-sm' },
-                    { id: 'circle', label: '圆形', icon: 'rounded-full' }
+                    { id: 'square' as const, label: '圆角矩形', icon: 'rounded-sm' },
+                    { id: 'circle' as const, label: '圆形', icon: 'rounded-full' }
                   ].map((shape) => (
                     <button
                       key={shape.id}
-                      onClick={() => setQrStyle({...qrStyle, logoShape: shape.id as any})}
+                      onClick={() => setQrStyle({...qrStyle, logoShape: shape.id})}
                       className={cn(
                         "flex-1 flex items-center justify-center gap-1.5 rounded-2xl text-[9px] font-black uppercase tracking-tight transition-all border",
-                        (qrStyle.logoShape || 'square') === shape.id 
-                          ? "bg-primary text-white border-primary shadow-sm" 
+                        (qrStyle.logoShape || 'square') === shape.id
+                          ? "bg-primary text-white border-primary shadow-sm"
                           : "bg-white text-slate-400 border-white hover:bg-slate-50"
                       )}
                     >
@@ -726,14 +751,14 @@ export default function App() {
               <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">容错率设置</h3>
               <div className="flex bg-white/50 backdrop-blur-md p-1 rounded-2xl border border-white">
                 {[
-                  { id: 'L', label: 'L (7%)' },
-                  { id: 'M', label: 'M (15%)' },
-                  { id: 'Q', label: 'Q (25%)' },
-                  { id: 'H', label: 'H (30%)' }
+                  { id: 'L' as const, label: 'L (7%)' },
+                  { id: 'M' as const, label: 'M (15%)' },
+                  { id: 'Q' as const, label: 'Q (25%)' },
+                  { id: 'H' as const, label: 'H (30%)' }
                 ].map((level) => (
                   <button
                     key={level.id}
-                    onClick={() => setQrStyle({...qrStyle, level: level.id as any})}
+                    onClick={() => setQrStyle({...qrStyle, level: level.id})}
                     className={cn(
                       "flex-1 py-2.5 rounded-[0.8rem] text-[10px] font-black transition-all",
                       qrStyle.level === level.id ? "bg-primary text-white shadow-lg" : "text-slate-400"
@@ -766,7 +791,7 @@ export default function App() {
             <button 
               onClick={handleSave}
               disabled={!displayContent}
-              className="w-full py-4 bg-gradient-to-br from-primary to-[#00a2ff] text-white rounded-[28px] font-black shadow-lg shadow-primary/20 hover:brightness-110 transition-all disabled:grayscale disabled:opacity-50 active:scale-[0.96] text-sm tracking-tight"
+              className="w-full py-4 bg-gradient-to-br from-primary to-blue-500 text-white rounded-[28px] font-black shadow-lg shadow-primary/20 hover:brightness-110 transition-all disabled:grayscale disabled:opacity-50 active:scale-[0.96] text-sm tracking-tight"
             >
               保存并导出高清图 ({exportSize}px)
             </button>
@@ -1108,7 +1133,7 @@ export default function App() {
 
       {/* Privacy Consent Modal - Shows on first launch */}
       {showPrivacyConsent && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-[120]">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-120">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -1163,7 +1188,7 @@ export default function App() {
 
       {/* Agreement Detail Modal */}
       {showAgreementDetail && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-[130]">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-130">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -1195,7 +1220,7 @@ export default function App() {
 
       {/* Decline Confirm Modal */}
       {showDeclineModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-[140]">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-140">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -1234,7 +1259,7 @@ const PrivacyPolicyContent = () => (
     <h1 className="text-2xl font-bold text-[#0071E3] text-center mb-2">🔒 隐私政策</h1>
     <p className="text-center text-gray-500 mb-6"><strong>生效日期</strong>：2026年05月20日</p>
 
-    <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg border-l-4 border-[#0071E3] mb-6">
+    <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg border-l-4 border-blue-600 mb-6">
       <p className="text-gray-700">欢迎使用「快序二维码」（以下简称"本应用"）。本应用由<strong>光年跃迁（温州）科技有限公司</strong>（以下简称"我们"）开发并运营。我们深知个人信息对您的重要性，将严格遵守《中华人民共和国个人信息保护法》等相关法律法规，保护您的个人信息安全。</p>
     </div>
 
