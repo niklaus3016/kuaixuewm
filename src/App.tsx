@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
+import LogoImage from '../kuaixu512.png';
 import {
   Link,
   Type,
@@ -937,7 +938,7 @@ export default function App() {
             >
               <div className="text-center">
                 <div className="w-28 h-28 rounded-[3rem] shadow-ios mx-auto flex items-center justify-center mb-6 relative group overflow-hidden bg-white">
-                   <img src="/kuaixu512.png" alt="Logo" className="w-20 h-20 object-contain" />
+                   <img src={LogoImage} alt="Logo" className="w-20 h-20 object-contain" />
                 </div>
                 <h1 className="text-2xl font-black text-black tracking-tight mb-2">快序二维码</h1>
                 <p className="text-xs text-slate-400 font-black tracking-[0.15em] uppercase">Version 1.0</p>
