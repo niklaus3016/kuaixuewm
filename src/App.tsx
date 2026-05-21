@@ -412,7 +412,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-md mx-auto bg-[#f2f2f7] overflow-hidden shadow-2xl relative md:my-8 md:h-[90vh] md:rounded-[50px] md:border-[12px] md:border-black pt-4">
+    <div className="flex flex-col h-screen max-w-md mx-auto bg-[#f2f2f7] overflow-hidden shadow-2xl relative md:my-8 md:h-[90vh] md:rounded-[50px] md:border-3 md:border-black pt-4">
 
       {/* --- Floating Toast --- */}
       <AnimatePresence>
